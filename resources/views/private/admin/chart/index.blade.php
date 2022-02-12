@@ -89,6 +89,7 @@
                 url: "{{ route('show-charts-by-user-id') }}/" + id,
                 success: function({data}) {
                     const container = $('#charts')
+                    let isContained = false
                     container.empty()
                     const tests = data
 
@@ -101,6 +102,7 @@
                         const title = $('<h3>').addClass('mb-3 text-center').text(name)
 
                         if (result) {
+                            isContained = true
                             wrapper.addClass('chart-container')
                             wrapper.append(title)
 
@@ -150,6 +152,16 @@
                         }
                         container.append(wrapper)
                         container.append($('<hr>'))
+                    }
+
+                    if (!isContained) {
+                        const alert = $('<div>')
+                            .addClass('alert alert-danger w-100 mt-5')
+                            .text('У пользователя не найдено пройденных или назначенных тестов')
+                            .prepend(
+                                $('<i>').addClass('fa fa-bell mr-3')
+                            )
+                        container.append(alert)
                     }
                 }
             })
