@@ -38,7 +38,9 @@
             <div class="container-fluid">
                 <select name="questions[]" multiple="multiple" class="select2 w-100">
                     @foreach($categories as $category)
-                        <optgroup label="{{ $category->name }}"></optgroup>
+                        @if($category->questions->count())
+                            <optgroup label="{{ $category->name }}"></optgroup>
+                        @endif
                         @foreach($category->questions as $question)
                             <option value="{{ $question->id }}">{{ $question->text }}</option>
                         @endforeach
@@ -60,7 +62,7 @@
 @push('js')
     <script src="/js/select2.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             const $select = $('.select2')
             const $saveButton = $('.saveButton')
@@ -73,11 +75,11 @@
                 closeOnSelect: false,
             });
 
-            $saveButton.click(function() {
+            $saveButton.click(function () {
                 $.confirm({
                     title: '<i class=\"fa fa-cogs\" aria-hidden=\"true\"></i> Конфигурация нового теста',
                     theme: 'material',
-                    content: function() {
+                    content: function () {
                         const self = this;
                         return $.ajax({
                             url: "{{ route('create-test-modal') }}",
@@ -93,13 +95,13 @@
                             btnClass: 'btn-link',
                             text: 'Создать тест',
                             keys: ['enter'],
-                            action: function(){
+                            action: function () {
                                 const self = this
                                 const form = self.$content.find('form')
                                 const data = form.serializeArray()
                                 let isValid = true
 
-                                Array.prototype.filter.call(form, function(form) {
+                                Array.prototype.filter.call(form, function (form) {
                                     if (form.checkValidity() === false) {
                                         isValid = false
                                     }
@@ -109,8 +111,8 @@
                                 form.find('.select2').addClass('was-validate')
 
                                 if (isValid) {
-                                    data.push({name: "_token", value: "{{csrf_token()}}" })
-                                    questionIds.forEach(function(id) {
+                                    data.push({name: "_token", value: "{{csrf_token()}}"})
+                                    questionIds.forEach(function (id) {
                                         data.push({name: "question_ids[]", value: id})
                                     })
 
@@ -119,7 +121,7 @@
                                         type: 'POST',
                                         data: $.param(data),
                                         dataType: 'JSON',
-                                        success: function() {
+                                        success: function () {
                                             location.href = "{{ route('management-test') }}"
                                         }
                                     })
@@ -139,7 +141,7 @@
                 });
             })
 
-            $('body').on('keypress', '.jconfirm', function (e){
+            $('body').on('keypress', '.jconfirm', function (e) {
                 if (e.code === 'Enter') {
                     $(this).find('.jconfirm-buttons button:first-child').trigger('click')
                     e.preventDefault();
@@ -152,7 +154,7 @@
                 $.ajax({
                     method: 'GET',
                     url: 'test/question/' + questionId,
-                    success: function(response) {
+                    success: function (response) {
                         const questionId = response.questionId
                         const question = response.questionText
                         const answers = response.answers
@@ -160,15 +162,15 @@
 
                         const $div = $('<div>')
                             .addClass('w-100 mb-3 question-container')
-                            .attr('id', 'questionId_'+questionId)
+                            .attr('id', 'questionId_' + questionId)
 
                         const $questionDIV = $('<div>').addClass('font-weight-bold').text(question)
                         let counter = 1
 
                         $div.append($questionDIV)
 
-                        answers.forEach(function(answerText) {
-                            const $answerDIV = $('<div>').text(counter++ +'. '+answerText)
+                        answers.forEach(function (answerText) {
+                            const $answerDIV = $('<div>').text(counter++ + '. ' + answerText)
                             $div.append($answerDIV)
 
                         })
