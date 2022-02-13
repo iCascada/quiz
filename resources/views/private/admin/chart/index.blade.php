@@ -110,7 +110,7 @@
                                 canvas[0]
                                     .getContext('2d'),
                                 {
-                                    type: 'doughnut',
+                                    type: 'pie',
                                     data: {
                                         labels: ['Верные ответы, %', 'Неверные ответы, %'],
                                         datasets: [{
